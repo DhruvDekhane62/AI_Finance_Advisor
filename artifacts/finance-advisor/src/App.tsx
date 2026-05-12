@@ -40,11 +40,6 @@ function AppRoutes() {
     return <Redirect to="/landing" />;
   }
 
-  // Logged in, on root: redirect to onboarding if profile not complete
-  if (user && location === "/" && !user.profileCompleted) {
-    return <Redirect to="/onboarding" />;
-  }
-
   // Logged in, trying to hit auth pages: redirect to dashboard
   if (user && (location === "/login" || location === "/register" || location === "/landing")) {
     return <Redirect to="/" />;
