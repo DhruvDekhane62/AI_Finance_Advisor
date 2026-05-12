@@ -3,13 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AI-Powered Personal Finance Advisor API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: transactions
+    description: Transaction management
+  - name: budgets
+    description: Budget management
+  - name: categories
+    description: Expense categories
+  - name: chat
+    description: AI chatbot advisor
+  - name: analytics
+    description: Spending analytics and insights
 paths:
   /healthz:
     get:
@@ -24,6 +34,298 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /transactions:
+    get:
+      operationId: listTransactions
+      tags: [transactions]
+      summary: List all transactions
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [income, expense]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+    post:
+      operationId: createTransaction
+      tags: [transactions]
+      summary: Add a transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionInput"
+      responses:
+        "201":
+          description: Created transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /transactions/{id}:
+    get:
+      operationId: getTransaction
+      tags: [transactions]
+      summary: Get a transaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateTransaction
+      tags: [transactions]
+      summary: Update a transaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionUpdate"
+      responses:
+        "200":
+          description: Updated transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+    delete:
+      operationId: deleteTransaction
+      tags: [transactions]
+      summary: Delete a transaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /budgets:
+    get:
+      operationId: listBudgets
+      tags: [budgets]
+      summary: List all budgets
+      responses:
+        "200":
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Budget"
+    post:
+      operationId: createBudget
+      tags: [budgets]
+      summary: Create a budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetInput"
+      responses:
+        "201":
+          description: Created budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Budget"
+
+  /budgets/{id}:
+    patch:
+      operationId: updateBudget
+      tags: [budgets]
+      summary: Update a budget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetUpdate"
+      responses:
+        "200":
+          description: Updated budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Budget"
+    delete:
+      operationId: deleteBudget
+      tags: [budgets]
+      summary: Delete a budget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List expense categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /chat/messages:
+    get:
+      operationId: listChatMessages
+      tags: [chat]
+      summary: List chat messages history
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatMessage"
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a message to the AI advisor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatInput"
+      responses:
+        "200":
+          description: AI advisor response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessage"
+
+  /analytics/summary:
+    get:
+      operationId: getFinancialSummary
+      tags: [analytics]
+      summary: Get financial summary (income, expenses, savings)
+      responses:
+        "200":
+          description: Financial summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinancialSummary"
+
+  /analytics/spending-by-category:
+    get:
+      operationId: getSpendingByCategory
+      tags: [analytics]
+      summary: Get spending breakdown by category
+      responses:
+        "200":
+          description: Spending by category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategorySpending"
+
+  /analytics/monthly-trend:
+    get:
+      operationId: getMonthlyTrend
+      tags: [analytics]
+      summary: Get monthly income and expense trend for last 6 months
+      responses:
+        "200":
+          description: Monthly trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyTrend"
+
+  /analytics/predictions:
+    get:
+      operationId: getSpendingPredictions
+      tags: [analytics]
+      summary: Get AI-based spending predictions and alerts
+      responses:
+        "200":
+          description: Spending predictions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpendingPredictions"
+
+  /analytics/budget-status:
+    get:
+      operationId: getBudgetStatus
+      tags: [analytics]
+      summary: Get budget utilization for all active budgets
+      responses:
+        "200":
+          description: Budget status list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BudgetStatus"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +336,213 @@ components:
       required:
         - status
 
+    Transaction:
+      type: object
+      required: [id, amount, type, category, description, date, createdAt]
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [income, expense]
+        category:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+        createdAt:
+          type: string
+
+    TransactionInput:
+      type: object
+      required: [amount, type, category, description, date]
+      properties:
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [income, expense]
+        category:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+
+    TransactionUpdate:
+      type: object
+      properties:
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [income, expense]
+        category:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+
+    Budget:
+      type: object
+      required: [id, category, limit, period, createdAt]
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        limit:
+          type: number
+        period:
+          type: string
+          enum: [monthly, weekly]
+        createdAt:
+          type: string
+
+    BudgetInput:
+      type: object
+      required: [category, limit, period]
+      properties:
+        category:
+          type: string
+        limit:
+          type: number
+        period:
+          type: string
+          enum: [monthly, weekly]
+
+    BudgetUpdate:
+      type: object
+      properties:
+        category:
+          type: string
+        limit:
+          type: number
+        period:
+          type: string
+          enum: [monthly, weekly]
+
+    Category:
+      type: object
+      required: [id, name, icon, color]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+
+    ChatMessage:
+      type: object
+      required: [id, role, content, createdAt]
+      properties:
+        id:
+          type: integer
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        createdAt:
+          type: string
+
+    ChatInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+
+    FinancialSummary:
+      type: object
+      required: [totalIncome, totalExpenses, netSavings, savingsRate, transactionCount, thisMonthExpenses, thisMonthIncome]
+      properties:
+        totalIncome:
+          type: number
+        totalExpenses:
+          type: number
+        netSavings:
+          type: number
+        savingsRate:
+          type: number
+        transactionCount:
+          type: integer
+        thisMonthExpenses:
+          type: number
+        thisMonthIncome:
+          type: number
+
+    CategorySpending:
+      type: object
+      required: [category, total, percentage, color]
+      properties:
+        category:
+          type: string
+        total:
+          type: number
+        percentage:
+          type: number
+        color:
+          type: string
+
+    MonthlyTrend:
+      type: object
+      required: [month, income, expenses, savings]
+      properties:
+        month:
+          type: string
+        income:
+          type: number
+        expenses:
+          type: number
+        savings:
+          type: number
+
+    SpendingPredictions:
+      type: object
+      required: [predictedMonthlyExpense, confidenceLevel, alerts, recommendations, riskLevel]
+      properties:
+        predictedMonthlyExpense:
+          type: number
+        confidenceLevel:
+          type: number
+        riskLevel:
+          type: string
+          enum: [low, medium, high]
+        alerts:
+          type: array
+          items:
+            type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+
+    BudgetStatus:
+      type: object
+      required: [id, category, limit, spent, remaining, percentage, period, status]
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        limit:
+          type: number
+        spent:
+          type: number
+        remaining:
+          type: number
+        percentage:
+          type: number
+        period:
+          type: string
+        status:
+          type: string
+          enum: [safe, warning, exceeded]

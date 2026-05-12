@@ -1,0 +1,75 @@
+1. Project Title + Problem Statement
+
+Project Title:
+AI-Powered Personal Finance Advisor using Agentic AI
+
+Problem Statement:
+
+Users lack proper financial planning and awareness
+Existing apps only track expenses, no intelligent insights
+No personalized financial guidance based on user behavior
+Overspending and poor saving habits are common
+Professional financial advisors are costly and inaccessible
+
+
+2. Overview + Theme
+
+Overview:
+
+An intelligent system that manages and analyzes personal finances
+Uses Agentic AI to provide real-time insights and predictions
+Acts as a virtual financial assistant through chatbot interface
+Theme:
+👉 “Smart Financial Decision-Making using AI”
+
+
+🎯 3. Objective
+To help users manage income, expenses, and savings effectively
+To provide personalized financial advice using AI
+To predict future expenses and prevent overspending
+To improve financial awareness and decision-making
+To make financial advisory accessible to everyone
+
+
+4. Solution
+Proposed Solution
+Agentic AI-based Finance Advisor:
+A multi-agent system that continuously monitors user data, analyzes spending, predicts future risks, and provides personalized financial guidance automatically.
+Agents in the System
+Data Agent:
+Collects user transaction data (manual input/API), cleans it, and stores it in a structured format for further processing.
+Analysis Agent:
+Examines past data to identify spending patterns, trends, and unusual activities in user behavior.
+Prediction Agent:
+Uses ML models to forecast future expenses and detect possible overspending before it happens.
+Recommendation Agent:
+Generates personalized suggestions like budget plans, savings strategies, and expense control tips.
+Chatbot Agent:
+Acts as the interface between user and system, allowing interaction in simple natural language.
+Orchestrator (Controller):
+Coordinates all agents, decides which agent to call, and combines outputs into a final response.
+Workflow (How Agents Work Together)
+Step 1: User Input
+User enters data or asks a query through the chatbot interface.
+Step 2: Orchestrator Routing
+The orchestrator understands the request and sends it to relevant agents.
+Step 3: Parallel Processing
+Data, analysis, and prediction agents process information simultaneously.
+Step 4: Insight Generation
+Recommendation agent combines results to create meaningful advice.
+Step 5: Final Response
+Chatbot delivers clear insights, alerts, and suggestions to the user.
+
+5. Future Scope
+Bank & UPI integration:
+Automatic data collection from bank accounts for real-time tracking.
+Investment guidance:
+AI-based suggestions for stocks, mutual funds, and savings plans.
+Tax optimization:
+Helps users plan and reduce taxes with smart recommendations.
+Voice assistant:
+Interaction through voice commands for better accessibility.
+Family finance mode:
+Manage multiple users’ finances in a single platform.
+Credit score tracking:
+Monitor and improve credit health using AI insights.
