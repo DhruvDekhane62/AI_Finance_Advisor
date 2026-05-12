@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./authUser";
 export * from "./budget";
 export * from "./budgetInput";
 export * from "./budgetInputPeriod";
@@ -23,7 +24,9 @@ export * from "./financialSummary";
 export * from "./healthStatus";
 export * from "./listTransactionsParams";
 export * from "./listTransactionsType";
+export * from "./loginInput";
 export * from "./monthlyTrend";
+export * from "./registerInput";
 export * from "./spendingPredictions";
 export * from "./spendingPredictionsRiskLevel";
 export * from "./transaction";
@@ -32,3 +35,5 @@ export * from "./transactionInputType";
 export * from "./transactionType";
 export * from "./transactionUpdate";
 export * from "./transactionUpdateType";
+export * from "./userProfile";
+export * from "./userProfileInput";

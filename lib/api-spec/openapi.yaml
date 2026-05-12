@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: profile
+    description: User profile management
   - name: transactions
     description: Transaction management
   - name: budgets
@@ -34,6 +38,104 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Registered user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "409":
+          description: Email already in use
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout current user
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get currently logged-in user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Not authenticated
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: Profile not found
+    put:
+      operationId: upsertProfile
+      tags: [profile]
+      summary: Create or update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileInput"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
 
   /transactions:
     get:
@@ -335,6 +437,117 @@ components:
           type: string
       required:
         - status
+
+    RegisterInput:
+      type: object
+      required: [email, password, fullName]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        fullName:
+          type: string
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthUser:
+      type: object
+      required: [id, email, fullName, createdAt]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        fullName:
+          type: string
+        profileCompleted:
+          type: boolean
+        createdAt:
+          type: string
+
+    UserProfile:
+      type: object
+      required: [id, userId, profileCompleted]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        phone:
+          type: string
+        occupation:
+          type: string
+        employerName:
+          type: string
+        monthlyIncome:
+          type: number
+        estimatedMonthlyExpenses:
+          type: number
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+        accountType:
+          type: string
+        ifscCode:
+          type: string
+        branchName:
+          type: string
+        monthlyRent:
+          type: number
+        emiAmount:
+          type: number
+        insurancePremium:
+          type: number
+        financialGoal:
+          type: string
+        profileCompleted:
+          type: boolean
+
+    UserProfileInput:
+      type: object
+      properties:
+        phone:
+          type: string
+        occupation:
+          type: string
+        employerName:
+          type: string
+        monthlyIncome:
+          type: number
+        estimatedMonthlyExpenses:
+          type: number
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+        accountType:
+          type: string
+        ifscCode:
+          type: string
+        branchName:
+          type: string
+        monthlyRent:
+          type: number
+        emiAmount:
+          type: number
+        insurancePremium:
+          type: number
+        financialGoal:
+          type: string
+        profileCompleted:
+          type: boolean
 
     Transaction:
       type: object

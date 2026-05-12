@@ -16,6 +16,108 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
+ * @summary Register a new user
+ */
+export const registerBodyPasswordMin = 6;
+
+export const RegisterBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string().min(registerBodyPasswordMin),
+  fullName: zod.string(),
+});
+
+/**
+ * @summary Login with email and password
+ */
+export const LoginBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string(),
+});
+
+export const LoginResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+  fullName: zod.string(),
+  profileCompleted: zod.boolean().optional(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get currently logged-in user
+ */
+export const GetMeResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+  fullName: zod.string(),
+  profileCompleted: zod.boolean().optional(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get current user profile
+ */
+export const GetProfileResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  phone: zod.string().optional(),
+  occupation: zod.string().optional(),
+  employerName: zod.string().optional(),
+  monthlyIncome: zod.number().optional(),
+  estimatedMonthlyExpenses: zod.number().optional(),
+  bankName: zod.string().optional(),
+  accountNumber: zod.string().optional(),
+  accountType: zod.string().optional(),
+  ifscCode: zod.string().optional(),
+  branchName: zod.string().optional(),
+  monthlyRent: zod.number().optional(),
+  emiAmount: zod.number().optional(),
+  insurancePremium: zod.number().optional(),
+  financialGoal: zod.string().optional(),
+  profileCompleted: zod.boolean(),
+});
+
+/**
+ * @summary Create or update user profile
+ */
+export const UpsertProfileBody = zod.object({
+  phone: zod.string().optional(),
+  occupation: zod.string().optional(),
+  employerName: zod.string().optional(),
+  monthlyIncome: zod.number().optional(),
+  estimatedMonthlyExpenses: zod.number().optional(),
+  bankName: zod.string().optional(),
+  accountNumber: zod.string().optional(),
+  accountType: zod.string().optional(),
+  ifscCode: zod.string().optional(),
+  branchName: zod.string().optional(),
+  monthlyRent: zod.number().optional(),
+  emiAmount: zod.number().optional(),
+  insurancePremium: zod.number().optional(),
+  financialGoal: zod.string().optional(),
+  profileCompleted: zod.boolean().optional(),
+});
+
+export const UpsertProfileResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  phone: zod.string().optional(),
+  occupation: zod.string().optional(),
+  employerName: zod.string().optional(),
+  monthlyIncome: zod.number().optional(),
+  estimatedMonthlyExpenses: zod.number().optional(),
+  bankName: zod.string().optional(),
+  accountNumber: zod.string().optional(),
+  accountType: zod.string().optional(),
+  ifscCode: zod.string().optional(),
+  branchName: zod.string().optional(),
+  monthlyRent: zod.number().optional(),
+  emiAmount: zod.number().optional(),
+  insurancePremium: zod.number().optional(),
+  financialGoal: zod.string().optional(),
+  profileCompleted: zod.boolean(),
+});
+
+/**
  * @summary List all transactions
  */
 export const ListTransactionsQueryParams = zod.object({

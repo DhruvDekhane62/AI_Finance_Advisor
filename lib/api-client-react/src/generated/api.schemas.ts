@@ -9,6 +9,64 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface RegisterInput {
+  email: string;
+  /** @minLength 6 */
+  password: string;
+  fullName: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  fullName: string;
+  profileCompleted?: boolean;
+  createdAt: string;
+}
+
+export interface UserProfile {
+  id: number;
+  userId: number;
+  phone?: string;
+  occupation?: string;
+  employerName?: string;
+  monthlyIncome?: number;
+  estimatedMonthlyExpenses?: number;
+  bankName?: string;
+  accountNumber?: string;
+  accountType?: string;
+  ifscCode?: string;
+  branchName?: string;
+  monthlyRent?: number;
+  emiAmount?: number;
+  insurancePremium?: number;
+  financialGoal?: string;
+  profileCompleted: boolean;
+}
+
+export interface UserProfileInput {
+  phone?: string;
+  occupation?: string;
+  employerName?: string;
+  monthlyIncome?: number;
+  estimatedMonthlyExpenses?: number;
+  bankName?: string;
+  accountNumber?: string;
+  accountType?: string;
+  ifscCode?: string;
+  branchName?: string;
+  monthlyRent?: number;
+  emiAmount?: number;
+  insurancePremium?: number;
+  financialGoal?: string;
+  profileCompleted?: boolean;
+}
+
 export type TransactionType =
   (typeof TransactionType)[keyof typeof TransactionType];
 
