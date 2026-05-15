@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    store: new PgSession({ pool, createTableIfMissing: true }),
+    store: new PgSession({ pool }),
     secret: process.env["SESSION_SECRET"] || "clearfin-dev-secret",
     resave: false,
     saveUninitialized: false,
