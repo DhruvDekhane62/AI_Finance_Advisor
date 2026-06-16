@@ -13,6 +13,7 @@ import Transactions from "@/pages/transactions";
 import Budgets from "@/pages/budgets";
 import Chat from "@/pages/chat";
 import Analytics from "@/pages/analytics";
+import Security from "@/pages/security";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ function AppRoutes() {
             <Route path="/budgets" component={Budgets} />
             <Route path="/chat" component={Chat} />
             <Route path="/analytics" component={Analytics} />
+            <Route path="/security" component={Security} />
             <Route component={NotFound} />
           </Switch>
         </Layout>

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Receipt, PiggyBank, MessageSquare, LineChart, Wallet, LogOut, User, ChevronUp } from "lucide-react";
+import { LayoutDashboard, Receipt, PiggyBank, MessageSquare, LineChart, Wallet, LogOut, User, ChevronUp, TrendingUp, Target, Shield } from "lucide-react";
 import { cn } from "@/lib/format";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <DropdownMenuItem onClick={() => navigate("/onboarding")} className="gap-2 cursor-pointer">
                 <User className="w-4 h-4" />
                 Edit Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/security")} className="gap-2 cursor-pointer">
+                <Shield className="w-4 h-4" />
+                Account Security
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="gap-2 cursor-pointer text-destructive focus:text-destructive">

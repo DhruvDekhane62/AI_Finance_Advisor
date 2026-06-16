@@ -1,4 +1,5 @@
 import { pgTable, text, serial, timestamp, real, pgEnum } from "drizzle-orm/pg-core";
+import { usersTable } from "./users";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -6,6 +7,7 @@ export const transactionTypeEnum = pgEnum("transaction_type", ["income", "expens
 
 export const transactionsTable = pgTable("transactions", {
   id: serial("id").primaryKey(),
+  userId: serial("user_id").notNull().references(() => usersTable.id),
   amount: real("amount").notNull(),
   type: transactionTypeEnum("type").notNull(),
   category: text("category").notNull(),

@@ -24,6 +24,9 @@ export const usersTable = pgTable("users", {
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   fullName: text("full_name").notNull(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  otpCode: text("otp_code"),
+  otpExpiresAt: timestamp("otp_expires_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -44,6 +47,7 @@ export const userProfilesTable = pgTable("user_profiles", {
   emiAmount: real("emi_amount"),
   insurancePremium: real("insurance_premium"),
   financialGoal: text("financial_goal"),
+  securityPin: text("security_pin"),
   profileCompleted: boolean("profile_completed").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -55,3 +59,12 @@ export type User = typeof usersTable.$inferSelect;
 export type UserProfile = typeof userProfilesTable.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+
+// Session table for connect-pg-simple
+import { varchar, json } from "drizzle-orm/pg-core";
+
+export const sessionTable = pgTable("session", {
+  sid: varchar("sid").notNull().primaryKey(),
+  sess: json("sess").notNull(),
+  expire: timestamp("expire", { precision: 6 }).notNull(),
+});

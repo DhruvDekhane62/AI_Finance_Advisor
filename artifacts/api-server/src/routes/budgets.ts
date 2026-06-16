@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db, budgetsTable } from "@workspace/db";
 import {
   CreateBudgetBody,
@@ -10,8 +10,8 @@ import {
 
 const router: IRouter = Router();
 
-router.get("/budgets", async (_req, res): Promise<void> => {
-  const rows = await db.select().from(budgetsTable).orderBy(budgetsTable.createdAt);
+router.get("/budgets", async (req: any, res): Promise<void> => {
+  const rows = await db.select().from(budgetsTable).where(eq(budgetsTable.userId, req.session.userId)).orderBy(budgetsTable.createdAt);
   res.json(rows.map((b) => ({ ...b, createdAt: b.createdAt.toISOString() })));
 });
 
@@ -22,7 +22,10 @@ router.post("/budgets", async (req, res): Promise<void> => {
     return;
   }
 
-  const [b] = await db.insert(budgetsTable).values(parsed.data).returning();
+  const [b] = await db.insert(budgetsTable).values({
+    ...parsed.data,
+    userId: req.session!.userId
+  }).returning();
   res.status(201).json({ ...b, createdAt: b.createdAt.toISOString() });
 });
 
@@ -42,7 +45,12 @@ router.patch("/budgets/:id", async (req, res): Promise<void> => {
   const [b] = await db
     .update(budgetsTable)
     .set(parsed.data)
-    .where(eq(budgetsTable.id, params.data.id))
+    .where(
+      and(
+        eq(budgetsTable.id, params.data.id),
+        eq(budgetsTable.userId, req.session!.userId)
+      )
+    )
     .returning();
 
   if (!b) {
@@ -59,7 +67,12 @@ router.delete("/budgets/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [b] = await db.delete(budgetsTable).where(eq(budgetsTable.id, params.data.id)).returning();
+  const [b] = await db.delete(budgetsTable).where(
+    and(
+      eq(budgetsTable.id, params.data.id),
+      eq(budgetsTable.userId, req.session!.userId)
+    )
+  ).returning();
   if (!b) {
     res.status(404).json({ error: "Budget not found" });
     return;

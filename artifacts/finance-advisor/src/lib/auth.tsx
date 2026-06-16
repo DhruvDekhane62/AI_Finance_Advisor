@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useLocation } from "wouter";
 
 export interface AuthUser {
-  id: number;
+  id: string | number;
   email: string;
   fullName: string;
   profileCompleted: boolean;

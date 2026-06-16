@@ -1,4 +1,5 @@
 modules = ["nodejs-24", "postgresql-16"]
+run = "pnpm start"
 
 [deployment]
 router = "application"

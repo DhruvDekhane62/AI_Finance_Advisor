@@ -19,7 +19,7 @@ router.get("/transactions", async (req, res): Promise<void> => {
     return;
   }
 
-  let conditions = [];
+  let conditions = [eq(transactionsTable.userId, req.session!.userId)];
   if (query.data.category) {
     conditions.push(eq(transactionsTable.category, query.data.category));
   }
@@ -44,7 +44,10 @@ router.post("/transactions", async (req, res): Promise<void> => {
     return;
   }
 
-  const [t] = await db.insert(transactionsTable).values(parsed.data).returning();
+  const [t] = await db.insert(transactionsTable).values({
+    ...parsed.data,
+    userId: req.session!.userId
+  }).returning();
   res.status(201).json({ ...t, createdAt: t.createdAt.toISOString() });
 });
 
@@ -55,7 +58,12 @@ router.get("/transactions/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [t] = await db.select().from(transactionsTable).where(eq(transactionsTable.id, params.data.id));
+  const [t] = await db.select().from(transactionsTable).where(
+    and(
+      eq(transactionsTable.id, params.data.id),
+      eq(transactionsTable.userId, req.session!.userId)
+    )
+  );
   if (!t) {
     res.status(404).json({ error: "Transaction not found" });
     return;
@@ -79,7 +87,12 @@ router.patch("/transactions/:id", async (req, res): Promise<void> => {
   const [t] = await db
     .update(transactionsTable)
     .set(parsed.data)
-    .where(eq(transactionsTable.id, params.data.id))
+    .where(
+      and(
+        eq(transactionsTable.id, params.data.id),
+        eq(transactionsTable.userId, req.session!.userId)
+      )
+    )
     .returning();
 
   if (!t) {
@@ -96,7 +109,12 @@ router.delete("/transactions/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [t] = await db.delete(transactionsTable).where(eq(transactionsTable.id, params.data.id)).returning();
+  const [t] = await db.delete(transactionsTable).where(
+    and(
+      eq(transactionsTable.id, params.data.id),
+      eq(transactionsTable.userId, req.session!.userId)
+    )
+  ).returning();
   if (!t) {
     res.status(404).json({ error: "Transaction not found" });
     return;

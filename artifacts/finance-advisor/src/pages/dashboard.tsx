@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetFinancialSummary, useListTransactions, useGetMonthlyTrend } from "@workspace/api-client-react";
+import { useGetFinancialSummary, useListTransactions, useGetMonthlyTrend, useGetSpendingPredictions } from "@workspace/api-client-react";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownRight, Wallet, Sparkles } from "lucide-react";
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const { data: summary, isLoading: isLoadingSummary } = useGetFinancialSummary();
   const { data: transactions, isLoading: isLoadingTransactions } = useListTransactions({ limit: 5 });
   const { data: trend, isLoading: isLoadingTrend } = useGetMonthlyTrend();
+  const { data: predictions, isLoading: isLoadingPredictions } = useGetSpendingPredictions();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -26,7 +27,7 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <SummaryCard 
           title="Total Balance" 
           amount={summary ? summary.totalIncome - summary.totalExpenses : 0} 
@@ -47,6 +48,14 @@ export default function Dashboard() {
           icon={ArrowDownRight} 
           iconColor="text-rose-500"
           isLoading={isLoadingSummary} 
+        />
+        <SummaryCard 
+          title="Predicted Expense" 
+          amount={predictions?.predictedMonthlyExpense || 0} 
+          icon={Sparkles} 
+          iconColor={predictions?.riskLevel === 'high' ? 'text-rose-500' : predictions?.riskLevel === 'medium' ? 'text-amber-500' : 'text-primary'}
+          trend={predictions?.riskLevel ? `${predictions.riskLevel} risk` : undefined}
+          isLoading={isLoadingPredictions} 
         />
       </div>
 

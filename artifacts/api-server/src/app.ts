@@ -6,6 +6,11 @@ import ConnectPgSimple from "connect-pg-simple";
 import { pool } from "@workspace/db";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const PgSession = ConnectPgSimple(session);
 
@@ -52,5 +57,22 @@ app.use(
 );
 
 app.use("/api", router);
+
+// Serve frontend static files from the combined single origin
+const publicPath = path.resolve(__dirname, "../../finance-advisor/dist/public");
+app.use(express.static(publicPath));
+
+// Fallback all non-API routing to index.html for SPA router support
+app.get(/.*/, (req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    return next();
+  }
+  res.sendFile(path.join(publicPath, "index.html"), (err) => {
+    if (err) {
+      // If index.html is missing (e.g. frontend not built yet), send a helpful error message
+      res.status(404).send("Frontend built files not found. Please build the frontend first using 'pnpm run build'.");
+    }
+  });
+});
 
 export default app;

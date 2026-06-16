@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, transactionsTable, budgetsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const router: IRouter = Router();
 
@@ -21,8 +21,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Other Expense": "#6b7280",
 };
 
-router.get("/analytics/summary", async (_req, res): Promise<void> => {
-  const all = await db.select().from(transactionsTable);
+router.get("/analytics/summary", async (req: any, res): Promise<void> => {
+  const all = await db.select().from(transactionsTable).where(eq(transactionsTable.userId, req.session.userId));
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
@@ -46,11 +46,16 @@ router.get("/analytics/summary", async (_req, res): Promise<void> => {
   });
 });
 
-router.get("/analytics/spending-by-category", async (_req, res): Promise<void> => {
+router.get("/analytics/spending-by-category", async (req: any, res): Promise<void> => {
   const expenses = await db
     .select()
     .from(transactionsTable)
-    .where(eq(transactionsTable.type, "expense"));
+    .where(
+      and(
+        eq(transactionsTable.type, "expense"),
+        eq(transactionsTable.userId, req.session.userId)
+      )
+    );
 
   const totalExpenses = expenses.reduce((s, t) => s + t.amount, 0);
   const byCategory: Record<string, number> = {};
@@ -70,8 +75,8 @@ router.get("/analytics/spending-by-category", async (_req, res): Promise<void> =
   res.json(result);
 });
 
-router.get("/analytics/monthly-trend", async (_req, res): Promise<void> => {
-  const all = await db.select().from(transactionsTable);
+router.get("/analytics/monthly-trend", async (req: any, res): Promise<void> => {
+  const all = await db.select().from(transactionsTable).where(eq(transactionsTable.userId, req.session.userId));
   const now = new Date();
 
   const months: { month: string; income: number; expenses: number; savings: number }[] = [];
@@ -96,8 +101,8 @@ router.get("/analytics/monthly-trend", async (_req, res): Promise<void> => {
   res.json(months);
 });
 
-router.get("/analytics/predictions", async (_req, res): Promise<void> => {
-  const all = await db.select().from(transactionsTable);
+router.get("/analytics/predictions", async (req: any, res): Promise<void> => {
+  const all = await db.select().from(transactionsTable).where(eq(transactionsTable.userId, req.session.userId));
   const now = new Date();
 
   // Compute avg monthly expenses over last 3 months
@@ -177,9 +182,14 @@ router.get("/analytics/predictions", async (_req, res): Promise<void> => {
   });
 });
 
-router.get("/analytics/budget-status", async (_req, res): Promise<void> => {
-  const budgets = await db.select().from(budgetsTable);
-  const transactions = await db.select().from(transactionsTable).where(eq(transactionsTable.type, "expense"));
+router.get("/analytics/budget-status", async (req: any, res): Promise<void> => {
+  const budgets = await db.select().from(budgetsTable).where(eq(budgetsTable.userId, req.session.userId));
+  const transactions = await db.select().from(transactionsTable).where(
+    and(
+      eq(transactionsTable.type, "expense"),
+      eq(transactionsTable.userId, req.session.userId)
+    )
+  );
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
