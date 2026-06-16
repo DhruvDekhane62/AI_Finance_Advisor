@@ -18,6 +18,7 @@ const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false, // STARTTLS
+  family: 4, // Force IPv4 to avoid ENETUNREACH on environments without proper IPv6 routing
   auth: {
     user: process.env.SMTP_USER?.replace(/^"|"$/g, ""),
     pass: process.env.SMTP_PASS?.replace(/^"|"$/g, ""),
