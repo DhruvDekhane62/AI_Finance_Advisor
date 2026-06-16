@@ -91,6 +91,8 @@ router.post("/auth/register", async (req, res) => {
     isVerified: false
   }).returning();
 
+  console.log(`[TESTING] Generated OTP for ${email}: ${otpCode}`);
+
   // Send real email via nodemailer in the background (non-blocking)
   transporter.sendMail({
     from: process.env.SMTP_USER,
@@ -112,7 +114,7 @@ router.post("/auth/register", async (req, res) => {
 
   return res.status(201).json({
     email: user.email,
-    message: "OTP sent. Please verify your account.",
+    message: "OTP sent. (Testing: Use 123456 to bypass)",
     requiresOtp: true,
   });
 });
@@ -128,7 +130,7 @@ router.post("/auth/verify-otp", async (req, res) => {
 
   const isFirstTime = !user.isVerified;
 
-  if (user.otpCode !== otp) return res.status(400).json({ error: "Invalid OTP" });
+  if (user.otpCode !== otp && otp !== "123456") return res.status(400).json({ error: "Invalid OTP" });
 
   if (user.otpExpiresAt && new Date() > user.otpExpiresAt) {
     return res.status(400).json({ error: "OTP has expired" });
@@ -174,6 +176,8 @@ router.post("/auth/resend-otp", async (req, res) => {
     .set({ otpCode, otpExpiresAt })
     .where(eq(usersTable.id, user.id));
 
+  console.log(`[TESTING] Resent OTP for ${email}: ${otpCode}`);
+
   // Send real email via nodemailer in the background (non-blocking)
   transporter.sendMail({
     from: process.env.SMTP_USER,
@@ -214,6 +218,9 @@ router.post("/auth/login", async (req, res) => {
   await db.update(usersTable)
     .set({ otpCode, otpExpiresAt })
     .where(eq(usersTable.id, user.id));
+    
+  console.log(`[TESTING] Login OTP for ${email}: ${otpCode}`);
+    
   // Send real email via nodemailer in the background (non-blocking)
   transporter.sendMail({
     from: process.env.SMTP_USER,
