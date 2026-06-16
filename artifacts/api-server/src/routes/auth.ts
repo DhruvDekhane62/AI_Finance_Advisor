@@ -5,6 +5,10 @@ import { usersTable, userProfilesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+// Force IPv4 resolution to fix ENETUNREACH errors on IPv4-only environments (like Render) when connecting to Gmail.
+dns.setDefaultResultOrder("ipv4first");
 import { seedUserData } from "../lib/seed";
 
 const router = Router();
@@ -86,27 +90,24 @@ router.post("/auth/register", async (req, res) => {
     isVerified: false
   }).returning();
 
-  // Send real email via nodemailer
-  try {
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "Verify your account",
-      html: `
-        <div style="font-family: Arial, sans-serif; text-align: center; max-width: 500px; margin: auto;">
-          <h2>ClearFin Account Verification</h2>
-          <p>Thank you for signing up! Please use the following 6-digit code to verify your email address.</p>
-          <div style="font-size: 32px; font-weight: bold; padding: 10px; background: #f4f4f4; border-radius: 8px; letter-spacing: 5px;">
-            ${otpCode}
-          </div>
-          <p style="color: gray; font-size: 14px; margin-top: 20px;">This code will expire in 10 minutes.</p>
+  // Send real email via nodemailer in the background (non-blocking)
+  transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: email,
+    subject: "Verify your account",
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; max-width: 500px; margin: auto;">
+        <h2>ClearFin Account Verification</h2>
+        <p>Thank you for signing up! Please use the following 6-digit code to verify your email address.</p>
+        <div style="font-size: 32px; font-weight: bold; padding: 10px; background: #f4f4f4; border-radius: 8px; letter-spacing: 5px;">
+          ${otpCode}
         </div>
-      `,
-    });
-    console.log(`[EMAIL] OTP sent to ${email}`);
-  } catch (error) {
-    console.error("[EMAIL ERROR] Failed to send email:", error);
-  }
+        <p style="color: gray; font-size: 14px; margin-top: 20px;">This code will expire in 10 minutes.</p>
+      </div>
+    `,
+  })
+  .then(() => console.log(`[EMAIL] OTP sent to ${email}`))
+  .catch((error) => console.error("[EMAIL ERROR] Failed to send email:", error));
 
   return res.status(201).json({
     email: user.email,
@@ -172,27 +173,24 @@ router.post("/auth/resend-otp", async (req, res) => {
     .set({ otpCode, otpExpiresAt })
     .where(eq(usersTable.id, user.id));
 
-  // Send real email via nodemailer
-  try {
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "Verify your account (Resend)",
-      html: `
-        <div style="font-family: Arial, sans-serif; text-align: center; max-width: 500px; margin: auto;">
-          <h2>ClearFin Account Verification</h2>
-          <p>You requested a new verification code. Please use the following 6-digit code to verify your email address.</p>
-          <div style="font-size: 32px; font-weight: bold; padding: 10px; background: #f4f4f4; border-radius: 8px; letter-spacing: 5px;">
-            ${otpCode}
-          </div>
-          <p style="color: gray; font-size: 14px; margin-top: 20px;">This code will expire in 10 minutes.</p>
+  // Send real email via nodemailer in the background (non-blocking)
+  transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: email,
+    subject: "Verify your account (Resend)",
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; max-width: 500px; margin: auto;">
+        <h2>ClearFin Account Verification</h2>
+        <p>You requested a new verification code. Please use the following 6-digit code to verify your email address.</p>
+        <div style="font-size: 32px; font-weight: bold; padding: 10px; background: #f4f4f4; border-radius: 8px; letter-spacing: 5px;">
+          ${otpCode}
         </div>
-      `,
-    });
-    console.log(`[EMAIL] Resent OTP to ${email}`);
-  } catch (error) {
-    console.error("[EMAIL ERROR] Failed to resend email:", error);
-  }
+        <p style="color: gray; font-size: 14px; margin-top: 20px;">This code will expire in 10 minutes.</p>
+      </div>
+    `,
+  })
+  .then(() => console.log(`[EMAIL] Resent OTP to ${email}`))
+  .catch((error) => console.error("[EMAIL ERROR] Failed to resend email:", error));
 
   return res.json({ message: "OTP resent successfully" });
 });
@@ -215,26 +213,24 @@ router.post("/auth/login", async (req, res) => {
   await db.update(usersTable)
     .set({ otpCode, otpExpiresAt })
     .where(eq(usersTable.id, user.id));
-  try {
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "Your ClearFin Login Code",
-      html: `
-        <div style="font-family: Arial, sans-serif; text-align: center; max-width: 500px; margin: auto;">
-          <h2>ClearFin Login Verification</h2>
-          <p>Use the code below to securely log in to your account.</p>
-          <div style="font-size: 32px; font-weight: bold; padding: 10px; background: #f4f4f4; border-radius: 8px; letter-spacing: 5px;">
-            ${otpCode}
-          </div>
-          <p style="color: gray; font-size: 14px; margin-top: 20px;">This code will expire in 10 minutes.</p>
+  // Send real email via nodemailer in the background (non-blocking)
+  transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: email,
+    subject: "Your ClearFin Login Code",
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; max-width: 500px; margin: auto;">
+        <h2>ClearFin Login Verification</h2>
+        <p>Use the code below to securely log in to your account.</p>
+        <div style="font-size: 32px; font-weight: bold; padding: 10px; background: #f4f4f4; border-radius: 8px; letter-spacing: 5px;">
+          ${otpCode}
         </div>
-      `,
-    });
-    console.log(`[EMAIL] OTP auto-sent for login to ${email}`);
-  } catch (error) {
-    console.error("[EMAIL ERROR] Failed to send OTP on login:", error);
-  }
+        <p style="color: gray; font-size: 14px; margin-top: 20px;">This code will expire in 10 minutes.</p>
+      </div>
+    `,
+  })
+  .then(() => console.log(`[EMAIL] OTP auto-sent for login to ${email}`))
+  .catch((error) => console.error("[EMAIL ERROR] Failed to send OTP on login:", error));
   return res.status(403).json({ error: "OTP Required", requiresOtp: true });
 });
 
